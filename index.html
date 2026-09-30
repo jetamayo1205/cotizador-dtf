@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visor 3D y Cotizador DTF - G-LAMDYCS</title>
-    <!-- Importar la librería oficial para modelos 3D interactivos -->
+    <!-- Librería oficial para modelos 3D interactivos -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -20,7 +20,7 @@
         input[type="file"] { font-size: 13px; }
         #info-metraje { background: #e9ecef; padding: 12px; border-radius: 5px; font-size: 13px; color: #495057; }
 
-        /* Visor 3D Real con la camiseta en .glb */
+        /* Contenedor del Visor 3D */
         #visor-3d {
             position: relative;
             width: 500px;
@@ -29,6 +29,9 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         model-viewer {
             width: 100%;
@@ -45,7 +48,7 @@
             border: 2px dashed #007bff;
             padding: 2px;
             background: rgba(255,255,255,0.05);
-            z-index: 5;
+            z-index: 10;
         }
     </style>
 </head>
@@ -65,7 +68,7 @@
                 <label><strong>Estampado DTF:</strong></label>
                 <label style="font-size: 12px; color: #666;">Sube tu diseño (PNG transparente):</label>
                 <input type="file" id="input-dtf" accept="image/png, image/jpeg" onchange="cargarEstampado(event)">
-                <span style="font-size: 11px; color: #007bff; font-weight: bold;">💡 Arrastra el diseño sobre la prenda y usa la rueda del mouse para rotar el modelo 3D.</span>
+                <span style="font-size: 11px; color: #007bff; font-weight: bold;">💡 Arrastra el diseño sobre la prenda y usa el mouse para rotar el modelo 3D.</span>
             </div>
 
             <div id="info-metraje">
@@ -76,12 +79,12 @@
 
         <div id="canvas-container">
             <div id="visor-3d">
-                <!-- Visor 3D que carga tu archivo .glb real de la carpeta models -->
+                <!-- Carga tu modelo .glb real desde la carpeta models -->
                 <model-viewer 
                     src="models/camiseta_semi_oversize_S_glTF.glb" 
                     alt="Camiseta 3D" 
-                    auto-rotate 
                     camera-controls 
+                    auto-rotate
                     shadow-intensity="1" 
                     environment-image="neutral">
                 </model-viewer>
@@ -116,7 +119,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Movimiento de arrastre libre del DTF sobre la pantalla
+        // Movimiento de arrastre libre del DTF
         const dtf = document.getElementById('estampado-interactivo');
         let dragging = false, startX, startY;
 
