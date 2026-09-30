@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visor 3D y Cotizador DTF - G-LAMDYCS</title>
+    <!-- Importar la librería oficial para modelos 3D interactivos -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background-color: #f4f4f9; }
@@ -18,38 +20,32 @@
         input[type="file"] { font-size: 13px; }
         #info-metraje { background: #e9ecef; padding: 12px; border-radius: 5px; font-size: 13px; color: #495057; }
 
-        /* Contenedor interactivo 3D simulado de alta fluidez */
+        /* Visor 3D Real con la camiseta en .glb */
         #visor-3d {
             position: relative;
-            width: 480px;
-            height: 580px;
+            width: 500px;
+            height: 600px;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: grab;
-            user-select: none;
+            overflow: hidden;
         }
-        #visor-3d:active { cursor: grabbing; }
-        #modelo-camisa {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
-            pointer-events: none;
-            transition: transform 0.1s ease-out;
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
         }
         #estampado-interactivo {
             position: absolute;
             width: 120px;
-            top: 205px;
-            left: 180px;
+            top: 250px;
+            left: 190px;
             cursor: move;
             display: none;
             border: 2px dashed #007bff;
             padding: 2px;
             background: rgba(255,255,255,0.05);
+            z-index: 5;
         }
     </style>
 </head>
@@ -69,7 +65,7 @@
                 <label><strong>Estampado DTF:</strong></label>
                 <label style="font-size: 12px; color: #666;">Sube tu diseño (PNG transparente):</label>
                 <input type="file" id="input-dtf" accept="image/png, image/jpeg" onchange="cargarEstampado(event)">
-                <span style="font-size: 11px; color: #007bff; font-weight: bold;">💡 Arrastra el diseño sobre la prenda y usa la rueda del mouse para hacer zoom.</span>
+                <span style="font-size: 11px; color: #007bff; font-weight: bold;">💡 Arrastra el diseño sobre la prenda y usa la rueda del mouse para rotar el modelo 3D.</span>
             </div>
 
             <div id="info-metraje">
@@ -80,7 +76,15 @@
 
         <div id="canvas-container">
             <div id="visor-3d">
-                <img id="modelo-camisa" src="models/s_blanco_frente.png" alt="Camiseta S">
+                <!-- Visor 3D que carga tu archivo .glb real de la carpeta models -->
+                <model-viewer 
+                    src="models/camiseta_semi_oversize_S_glTF.glb" 
+                    alt="Camiseta 3D" 
+                    auto-rotate 
+                    camera-controls 
+                    shadow-intensity="1" 
+                    environment-image="neutral">
+                </model-viewer>
                 <img id="estampado-interactivo" alt="Diseño DTF">
             </div>
         </div>
@@ -92,14 +96,10 @@
             btnElement.classList.add('active');
 
             const txt = document.getElementById('texto-metraje');
-            const camisa = document.getElementById('modelo-camisa');
-
             if (talla === 'S') {
                 txt.innerText = "Talla S: Metraje estándar aplicado (Escala 1:1, optimizado para corte base).";
-                camisa.style.transform = "scale(1)";
             } else {
                 txt.innerText = `Talla ${talla}: Ajustando escala y metraje proporcional.`;
-                camisa.style.transform = "scale(1.06)";
             }
         }
 
@@ -116,7 +116,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Movimiento de arrastre libre del DTF
+        // Movimiento de arrastre libre del DTF sobre la pantalla
         const dtf = document.getElementById('estampado-interactivo');
         let dragging = false, startX, startY;
 
@@ -134,15 +134,6 @@
         });
 
         document.addEventListener('mouseup', () => { dragging = false; });
-
-        // Zoom con la rueda del mouse en el visor
-        const visor = document.getElementById('visor-3d');
-        let zoomLevel = 1;
-        visor.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            zoomLevel = e.deltaY < 0 ? Math.min(zoomLevel + 0.1, 1.8) : Math.max(zoomLevel - 0.1, 0.8);
-            visor.style.transform = `scale(${zoomLevel})`;
-        }, { passive: false });
     </script>
 </body>
 </html>
