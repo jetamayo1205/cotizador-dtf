@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor 3D y Cotizador DTF - G-LAMDYCS</title>
+    <style>
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background-color: #f4f4f9; }
+        #app-container { display: flex; width: 100vw; height: 100vh; }
+        #sidebar { width: 320px; min-width: 320px; background: #fff; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 20px; z-index: 10; overflow-y: auto; height: 100%; }
+        #canvas-container { flex-grow: 1; position: relative; height: 100%; background: #eef2f5; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        h2 { margin-top: 0; color: #333; font-size: 20px; }
+        .section-group { display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #ddd; }
+        .size-btn { padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; transition: background 0.2s; }
+        .size-btn:hover { background: #0056b3; }
+        .size-btn.active { background: #28a745; }
+        input[type="file"] { font-size: 13px; }
+        #info-metraje { background: #e9ecef; padding: 12px; border-radius: 5px; font-size: 13px; color: #495057; }
+
+        /* Contenedor interactivo 3D simulado de alta fluidez */
+        #visor-3d {
+            position: relative;
+            width: 480px;
+            height: 580px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+        }
+        #visor-3d:active { cursor: grabbing; }
+        #modelo-camisa {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+        #estampado-interactivo {
+            position: absolute;
+            width: 120px;
+            top: 205px;
+            left: 180px;
+            cursor: move;
+            display: none;
+            border: 2px dashed #007bff;
+            padding: 2px;
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div id="sidebar">
+            <h2>Cotizador G-LAMDYCS</h2>
+            
+            <div class="section-group">
+                <label><strong>Seleccione la Talla:</strong></label>
+                <button class="size-btn active" onclick="cambiarTalla('S', this)">Talla S</button>
+                <button class="size-btn" onclick="cambiarTalla('M', this)">Talla M (Próximamente)</button>
+            </div>
+
+            <div class="section-group">
+                <label><strong>Estampado DTF:</strong></label>
+                <label style="font-size: 12px; color: #666;">Sube tu diseño (PNG transparente):</label>
+                <input type="file" id="input-dtf" accept="image/png, image/jpeg" onchange="cargarEstampado(event)">
+                <span style="font-size: 11px; color: #007bff; font-weight: bold;">💡 Arrastra el diseño sobre la prenda y usa la rueda del mouse para hacer zoom.</span>
+            </div>
+
+            <div id="info-metraje">
+                <strong>Metraje y Especificaciones:</strong><br>
+                <span id="texto-metraje">Talla S: Metraje estándar aplicado (Escala 1:1, optimizado para corte base).</span>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="visor-3d">
+                <img id="modelo-camisa" src="models/s_blanco_frente.png" alt="Camiseta S">
+                <img id="estampado-interactivo" alt="Diseño DTF">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cambiarTalla(talla, btnElement) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const txt = document.getElementById('texto-metraje');
+            const camisa = document.getElementById('modelo-camisa');
+
+            if (talla === 'S') {
+                txt.innerText = "Talla S: Metraje estándar aplicado (Escala 1:1, optimizado para corte base).";
+                camisa.style.transform = "scale(1)";
+            } else {
+                txt.innerText = `Talla ${talla}: Ajustando escala y metraje proporcional.`;
+                camisa.style.transform = "scale(1.06)";
+            }
+        }
+
+        function cargarEstampado(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('estampado-interactivo');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // Movimiento de arrastre libre del DTF
+        const dtf = document.getElementById('estampado-interactivo');
+        let dragging = false, startX, startY;
+
+        dtf.addEventListener('mousedown', (e) => {
+            dragging = true;
+            startX = e.clientX - dtf.offsetLeft;
+            startY = e.clientY - dtf.offsetTop;
+            e.stopPropagation();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            dtf.style.left = (e.clientX - startX) + 'px';
+            dtf.style.top = (e.clientY - startY) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => { dragging = false; });
+
+        // Zoom con la rueda del mouse en el visor
+        const visor = document.getElementById('visor-3d');
+        let zoomLevel = 1;
+        visor.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomLevel = e.deltaY < 0 ? Math.min(zoomLevel + 0.1, 1.8) : Math.max(zoomLevel - 0.1, 0.8);
+            visor.style.transform = `scale(${zoomLevel})`;
+        }, { passive: false });
+    </script>
+</body>
+</html>
