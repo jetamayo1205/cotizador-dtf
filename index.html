@@ -20,11 +20,11 @@
         input[type="file"] { font-size: 13px; }
         #info-metraje { background: #e9ecef; padding: 12px; border-radius: 5px; font-size: 13px; color: #495057; }
 
-        /* Contenedor del Visor 3D ajustado a proporción de prenda */
+        /* Contenedor del Visor 3D */
         #visor-3d {
             position: relative;
-            width: 420px;
-            height: 520px;
+            width: 450px;
+            height: 550px;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -38,17 +38,17 @@
             height: 100%;
             background-color: #ffffff;
         }
-        /* Diseño DTF interactivo para posicionar sobre el volumen */
+        /* Diseño DTF interactivo adaptado al volumen */
         #estampado-interactivo {
             position: absolute;
-            width: 110px;
-            top: 210px;
-            left: 155px;
+            width: 120px;
+            top: 220px;
+            left: 165px;
             cursor: move;
             display: none;
             border: 2px dashed #007bff;
             padding: 2px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(0, 123, 255, 0.08);
             z-index: 10;
         }
     </style>
@@ -80,14 +80,14 @@
 
         <div id="canvas-container">
             <div id="visor-3d">
-                <!-- model-viewer con reescalado estricto en el eje Y para corregir la elongación -->
+                <!-- model-viewer con corrección geométrica de escala para eliminar el estiramiento vertical -->
                 <model-viewer 
                     src="models/camiseta_blanca_frente_S.glb" 
                     alt="Camiseta Semi-Oversize 3D" 
                     camera-controls 
                     disable-zoom
                     camera-orbit="0deg 90deg 105%"
-                    scale="1 0.38 1"
+                    scale="1.2 0.38 1.2"
                     shadow-intensity="1">
                 </model-viewer>
                 <img id="estampado-interactivo" alt="Diseño DTF">
