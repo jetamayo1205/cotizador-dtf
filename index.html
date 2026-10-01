@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visor 3D y Cotizador DTF - G-LAMDYCS</title>
-    <!-- Librería oficial para modelos 3D interactivos -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -20,7 +19,6 @@
         input[type="file"] { font-size: 13px; }
         #info-metraje { background: #e9ecef; padding: 12px; border-radius: 5px; font-size: 13px; color: #495057; }
 
-        /* Contenedor del Visor 3D */
         #visor-3d {
             position: relative;
             width: 500px;
@@ -79,13 +77,13 @@
 
         <div id="canvas-container">
             <div id="visor-3d">
-                <!-- model-viewer con escalado forzado (scale) para corregir el efecto de estiramiento vertical -->
+                <!-- scale corregido para aplastar el eje vertical y dejar la camiseta en su proporción real -->
                 <model-viewer 
                     src="models/camiseta_blanca_frente_S.glb" 
-                    alt="Camiseta 3D con Volumen" 
+                    alt="Camiseta Semi-Oversize 3D" 
                     camera-controls 
                     auto-rotate
-                    scale="1 0.6 1"
+                    scale="1 0.35 1"
                     shadow-intensity="1">
                 </model-viewer>
                 <img id="estampado-interactivo" alt="Diseño DTF">
